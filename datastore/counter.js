@@ -39,24 +39,22 @@ const writeCounter = (count, callback) => {
 // Public API - Fix this function //////////////////////////////////////////////
 
 exports.getNextUniqueId = (callback) => {
-  //readCounter and pass in a function that we want 
-    //second paramter is an integer
 
   // counter = counter + 1;
-    //get counter from file
-    readCounter( (err, newCount) => {
-      if(err) {
-        callback(null, 0);
-      } else {
-        writeCounter( newCount+1, (err, padNums) => {
-          callback(null, padNums);
-        });
-      }
-    });
-    //incrementing by one
-    //save new counter in file
-  // return zeroPaddedNumber(counter);
-    //adding zeroes at beginning of the number/counter
+  //get counter from file
+  readCounter( (err, newCount) => {
+    if (err) {
+      callback(null, 0);
+    } else {
+      writeCounter( newCount+1, (err, padNums) => {
+        callback(null, padNums);
+      });
+    }
+  });
+  //incrementing by one
+  //save new counter in file
+// return zeroPaddedNumber(counter);
+  //adding zeroes at beginning of the number/counter
 };
 
 
