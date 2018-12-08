@@ -18,7 +18,7 @@ const zeroPaddedNumber = (num) => {
 const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
-      callback(null, 0);
+      callback(err, 0);
     } else {
       callback(null, Number(fileData));
     }
@@ -38,9 +38,25 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+exports.getNextUniqueId = (callback) => {
+  //readCounter and pass in a function that we want 
+    //second paramter is an integer
+
+  // counter = counter + 1;
+    //get counter from file
+    readCounter( (err, newCount) => {
+      if(err) {
+        callback(null, 0);
+      } else {
+        writeCounter( newCount+1, (err, padNums) => {
+          callback(null, padNums);
+        });
+      }
+    });
+    //incrementing by one
+    //save new counter in file
+  // return zeroPaddedNumber(counter);
+    //adding zeroes at beginning of the number/counter
 };
 
 
