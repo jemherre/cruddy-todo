@@ -50,13 +50,27 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  //read the file name
+  var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+  //check if  it exists
+  fs.readFile(fileName, 'utf8', (err, data) => {
+    if(err){
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.writeFile(fileName, text, (err) => {
+        if(err) {
+          callback(new Error(`No item with id: ${id}`));
+        } else {
+          callback(null, { id, 'text': text });
+        }
+      });
+    }
+  });
+    //write to file with new text
+      //if error throw new message
+      //else you return callback with the updated data
+  //else throw error for it not to exist
+
 };
 
 exports.delete = (id, callback) => {
