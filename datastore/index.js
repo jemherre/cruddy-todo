@@ -66,22 +66,23 @@ exports.update = (id, text, callback) => {
       });
     }
   });
-    //write to file with new text
-      //if error throw new message
-      //else you return callback with the updated data
+  //write to file with new text
+  //if error throw new message
+  //else you return callback with the updated data
   //else throw error for it not to exist
 
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  //convert the id to the var name in the dir
+  var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+  fs.unlink(fileName, (err) => {
+    if(err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback();
+    }
+  })
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
