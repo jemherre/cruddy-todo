@@ -24,7 +24,7 @@ exports.create = (text, callback) => {
 exports.readAll = (callback) => {
   //need path name
   var fileName = exports.dataDir;
-   //need to read directory for list of files >> return array
+  //need to read directory for list of files >> return array
   fs.readdir(fileName, (err, data) => {
     if(err) {
       throw err;
@@ -35,12 +35,18 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  //have filename from l12
+  var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+  //use readflie class name
+  fs.readFile(fileName, 'utf8', (err, data) => {
+    if(err){
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, { id, 'text': data });
+    }
+  });
+  //if error then the file does not exist
+  //else invoke callback to display the data
 };
 
 exports.update = (id, text, callback) => {
