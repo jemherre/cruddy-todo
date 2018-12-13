@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+var Promise = require('bluebird');
+var readFileAsync = Promise.promisify(fs.readFile);
 
 var items = {};
 
@@ -9,7 +11,8 @@ var items = {};
 
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
-    var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+    console.log('NEW #: ',id);
+    var fileName = path.join(exports.dataDir, `${id}.txt`); //'id.txt'
     fs.writeFile(fileName, text, (err) => {
       if(err) {
         throw err;
@@ -22,19 +25,28 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  //need path name
   var fileName = exports.dataDir;
-  //need to read directory for list of files >> return array
   fs.readdir(fileName, (err, data) => {
     if(err) {
       throw err;
     } else {
-      callback(null, data);
+      var readOneAsync = Promise.promisify(readOne);
+      var promisifiedArr = _.map(data,(file)=>{
+        var id = file.split('.txt')[0];
+        return readOneAsync(id);
+      });
+      Promise.all(promisifiedArr)
+        .then(dataList => {
+          callback(null, dataList);
+        })
+        .catch(err => {
+          callback(err);
+        });
     }
   });
 };
 
-exports.readOne = (id, callback) => {
+var readOne = (id, callback) => {
   //have filename from l12
   var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
   //use readflie class name
@@ -45,9 +57,8 @@ exports.readOne = (id, callback) => {
       callback(null, { id, 'text': data });
     }
   });
-  //if error then the file does not exist
-  //else invoke callback to display the data
 };
+exports.readOne = readOne;
 
 exports.update = (id, text, callback) => {
   //read the file name
@@ -66,23 +77,19 @@ exports.update = (id, text, callback) => {
       });
     }
   });
-  //write to file with new text
-  //if error throw new message
-  //else you return callback with the updated data
-  //else throw error for it not to exist
-
 };
 
 exports.delete = (id, callback) => {
   //convert the id to the var name in the dir
-  var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+  // var fileName = path.join(exports.dataDir, id + '.txt'); //'id.txt'
+  var fileName = path.join(exports.dataDir, `${id}.txt`); //'id.txt'
   fs.unlink(fileName, (err) => {
     if(err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
-      callback();
+      callback(null, 'yay deleted!');
     }
-  })
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
