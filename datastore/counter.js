@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
-
+var Promise = require('bluebird');
+var readFileAsync = Promise.promisify(fs.readFile);
+var writeFileAsync = Promise.promisify(fs.writeFile);
 var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
@@ -25,6 +27,19 @@ const readCounter = (callback) => {
   });
 };
 
+// var readCounterAsync = function(){
+//   var promise1 = new Promise( (reject,resolve) =>{
+//     readFileAsync(exports.counterFile,'utf8')
+//       .then((data)=>{
+//         resolve(data);
+//       })
+//       .catch((err)=>{
+//         reject(data);
+//       });
+//   });
+//   return promise1;
+// }
+
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
   fs.writeFile(exports.counterFile, counterString, (err) => {
@@ -36,9 +51,23 @@ const writeCounter = (count, callback) => {
   });
 };
 
+// var writeCounterAsync = function(count) {
+//   var promise1 = new Promise( (reject,resolve) => {
+//     var counterString = zeroPaddedNumber(count);
+//     writeFileAsync(exports.counterFile, counterString)
+//       .then(() => {
+//         resolve(counterString);
+//       })
+//       .catch((err) => {
+//         reject(err);
+//       });
+//   });
+//   return promise1;
+// }
+
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = (callback) => {
+var getNextUniqueId = (callback) => {
   readCounter( (err, newCount) => {
     if (err) {
       callback(err, null);
@@ -54,8 +83,17 @@ exports.getNextUniqueId = (callback) => {
   });
 };
 
+// var getNextUniqueIdAsync = function() {
+//   return readCounterAsync()
+//     .then((newCount) => {
+//      return writeCounterAsync(newCount+1)
+//         .then((padNums) => {
+//           return padNums;
+//         });
+//     });
+// }
 
-
+// exports.getNextUniqueIdAsync = getNextUniqueIdAsync; 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
-
+exports.getNextUniqueId = getNextUniqueId; 
 exports.counterFile = path.join(__dirname, 'counter.txt');
